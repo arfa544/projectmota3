@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Check BMI
+{% endblock %}
+
+{% block main %}
+    <center>
+        <h2><em>Calculate your Body Mass Index (BMI)</em></h2>
+        <input type="radio" id="imperial" name="units" value="imperial"><label for="imperial">Imperial</label>
+        <input type="radio" id="metric" name="units" value="metric" checked><label for="metric">Metric</label>
+        <form id="imperialBMI">
+            <div>
+                Height: <input autofocus autocomplete="off" type="number" id="feet" name="feet" placeholder="Feet" min=1>
+                <input autocomplete="off" type="number" name="inch" id="inch" placeholder="Inches" min=1> <br><br>
+            </div>
+            <div>
+                Weight: <input autocomplete="off" type="number" name="lbs" id="lbs" placeholder="Pounds" min=1> <br><br>
+            </div>
+            <button type="button" onclick="bmiImp()">Calculate BMI</button>
+            <button type="reset">Clear</button>
+            <div id="resultI" style="display: none; border: dashed yellow; margin: 15px; padding: 10px;"></div>
+        </form>
+        <form id="metricBMI">
+            <div>
+                Height: <input autofocus autocomplete="off" type="number" name="cms" id='cms' placeholder="Centimeters" min=1> <br><br>
+            </div>
+            <div>
+                Weight: <input autocomplete="off" type="number" name="kgs" id='kgs' placeholder="Kilograms" min=1> <br><br>
+            </div>
+            <button type="button" onclick="bmiMet()">Calculate BMI</button>
+            <button type="reset">Clear</button>
+            <div id="resultM" style="display: none; border: dashed yellow; margin: 15px; padding: 10px;;"></div>
+        </form>
+    </center>
+    <script>
+        var units = document.getElementsByName("units");
+        var imperial = document.getElementById("imperialBMI");
+        var metric = document.getElementById("metricBMI");
+
+        metric.style.display = 'block';
+        imperial.style.display = 'none';
+
+        for(var i = 0; i < units.length; i++) {
+            units[i].onclick = function() {
+                var val = this.value;
+                if(val == 'imperial') {
+                    imperial.style.display = 'block';
+                    metric.style.display = 'none';
+                }
+                else {
+                    metric.style.display = 'block';
+                    imperial.style.display = 'none';
+                }
+            }
+        }
+
+        function bmiMet() {
+            let h = parseInt(document.querySelector('#cms').value);
+            var w = parseInt(document.querySelector('#kgs').value);
+
+            let bmi = ((w * 10000) / (h * h)).toFixed(2);
+            var category = '';
+            var color = '';
+
+            if(bmi < 18.5) {
+                category = 'Underweight';
+                color = '#d69f40';
+            } else if (bmi >= 18.5 && bmi < 23) {
+                category = 'Normal';
+                color = '#36c240';
+            } else if (bmi >= 23 && bmi < 25) {
+                category = 'Overweight';
+                color = '#f2861b';
+            } else if (bmi >= 25 && bmi < 30) {
+                category = 'Pre-Obese';
+                color = '#f2631b';
+            } else if (bmi >= 30 && bmi < 40) {
+                category = 'Obese (Obese Type I)';
+                color = '#fc0303';
+            } else if (bmi >= 40 && bmi < 50) {
+                category = 'Morbid Obese (Obese Type II)';
+                color = '#fc0303';
+            } else {
+                category = 'Super Obese (Obese Type III)';
+                color = '#fc0303';
+            }
+
+            var e = document.getElementById("resultM");
+            e.style.display = 'block';
+            e.style.backgroundColor = color;
+            if(isNaN(bmi))
+                e.innerHTML = 'Invalid input!';
+            else
+                e.innerHTML = 'Your BMI is ' + String(bmi) +'<br>You are ' + category + ' as per Asian BMI criteria.<br><a href="https://en.wikipedia.org/wiki/Body_mass_index">Learn more about BMI</a>';
+        }
+
+        function bmiImp() {
+            let h = (parseInt(document.querySelector('#feet').value) * 12) + parseInt(document.querySelector('#inch').value);
+            let w = parseInt(document.querySelector('#lbs').value);
+
+            let bmi = ((w * 703) / (h * h)).toFixed(2);
+            var category = '';
+            var color = '';
+
+            if(bmi < 18.5) {
+                category = 'Underweight';
+                color = '#d69f40';
+            } else if (bmi >= 18.5 && bmi < 23) {
+                category = 'Normal';
+                color = '#36c240';
+            } else if (bmi >= 23 && bmi < 25) {
+                category = 'Overweight';
+                color = '#f2861b';
+            } else if (bmi >= 25 && bmi < 30) {
+                category = 'Pre-Obese';
+                color = '#f2631b';
+            } else if (bmi >= 30 && bmi < 40) {
+                category = 'Obese (Obese Type I)';
+                color = '#fc0303';
+            } else if (bmi >= 40 && bmi < 50) {
+                category = 'Morbid Obese (Obese Type II)';
+                color = '#fc0303';
+            } else {
+                category = 'Super Obese (Obese Type III)';
+                color = '#fc0303';
+            }
+
+            var e = document.getElementById("resultI");
+            e.style.display = 'block';
+            e.style.backgroundColor = color;
+            if(isNaN(bmi))
+                e.innerHTML = 'Invalid input!';
+            else
+                e.innerHTML = 'Your BMI is ' + String(bmi) +'<br>You are ' + category + ' as per Asian BMI criteria.<br><a href="https://en.wikipedia.org/wiki/Body_mass_index">Learn more about BMI</a>';
+        }
+    </script>
+{% endblock %}
+
+{% block section %}
+    The BMI is a convenient rule used to broadly categorize a person as underweight, normal weight, overweight, or obese based on tissue mass (muscle, fat, and bone) and height.
+    Major adult BMI classifications are underweight (under 18.5), normal weight (18.5 to 22.9), overweight (23 to 29.9), and obese (30 or more).
+{% endblock %}

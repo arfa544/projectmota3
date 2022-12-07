@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Update Profile
+{% endblock %}
+
+{% block main %}
+    <center>
+        <h3><em>Update Your Profile</em></h3>
+        <input type="radio" id="imperial" name="units" value="imperial"><label for="imperial">Imperial</label>
+        <input type="radio" id="metric" name="units" value="metric" checked><label for="metric">Metric</label>
+
+        <form action="/profile" method="post" id="imperialBMI">
+            <div>
+                Current Height: <input autofocus autocomplete="off" type="number" name="feet" id="feet" placeholder="Feet" min=1>
+                <input autofocus autocomplete="off" type="number" name="inch" id="inch" placeholder="Inch" min=0><br><br>
+            </div>
+            <div>
+                Current Weight: <input autocomplete="off" type="number" name="lbs" id="lbs" placeholder="Pounds" min=1><br><br>
+            </div>
+            <button type="submit" name="updateIm">Update</button>
+            <button type="reset">Clear</button>
+        </form>
+
+        <form action="/profile" method="post" id="metricBMI">
+            <div>
+                Current Height: <input autofocus autocomplete="off" type="number" name="cms" id="cms" placeholder="Centimeters" min=1><br><br>
+            </div>
+            <div>
+                Current Weight: <input autocomplete="off" type="number" name="kgs" id="kgs" placeholder="Kilograms" min=1><br><br>
+            </div>
+            <button type="submit" name="updateMe">Update</button>
+            <button type="reset">Clear</button>
+        </form>
+    </center>
+
+    <script>
+        var units = document.getElementsByName("units");
+        var imperial = document.getElementById("imperialBMI");
+        var metric = document.getElementById("metricBMI");
+
+        metric.style.display = 'block';
+        imperial.style.display = 'none';
+
+        for(var i = 0; i < units.length; i++) {
+            units[i].onclick = function() {
+                var val = this.value;
+                if(val == 'imperial') {
+                    imperial.style.display = 'block';
+                    metric.style.display = 'none';
+                }
+                else {
+                    metric.style.display = 'block';
+                    imperial.style.display = 'none';
+                }
+            }
+        }
+    </script>
+{% endblock %}

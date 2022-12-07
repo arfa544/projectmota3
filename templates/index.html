@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block main %}
+    <center>
+        <div>
+            <h2>Welcome back {{ user.upper() }}!</h2>
+            ProjectMota2 is a web application that helps you calculate the body mass index (BMI) and store the details of everyone in your family.
+        </div>
+        <hr>
+        <div id="dashboard">
+            <h3 style="text-decoration: underline;">Dashboard</h3>
+            {% for detail in details %}
+            HEIGHT: {{ detail["height"] }} cms <br><br>
+            WEIGHT: {{ detail["weight"] }} kgs <br><br>
+            BODY MASS INDEX (BMI): {{ detail["bmi"] }} <br><br>
+            LAST UPDATED ON: {{ detail["date"] }} <br><br>
+            REMARKS: You are currently {{ detail["category"] }}!<br>
+            {% endfor %}
+        </div>
+        <hr>
+    </center>
+{% endblock %}

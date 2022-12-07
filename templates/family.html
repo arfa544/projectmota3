@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Family Dashboard
+{% endblock %}
+
+{% block main %}
+    <center>
+        <h2 style="text-decoration: underline;">Family Dashboard</h2>
+        <hr>
+        <table id='dashTable' class="auto-index" cellspacing=0 cellpadding=10>
+            <thead>
+                <th>#</th>
+                <th>NAME</th>
+                <th>HEIGHT (IN CM)</th>
+                <th>WEIGHT (IN KG)</th>
+                <th>BODY MASS INDEX (BMI)</th>
+                <th>CATEGORY</th>
+            </thead>
+            <tbody>
+                {% for detail in details %}
+                    <tr>
+                        <td></td>
+                        <td>{{ detail['name'].upper() }}</td>
+                        <td>{{ detail['height'] }}</td>
+                        <td>{{ detail['weight'] }}</td>
+                        <td>{{ detail['bmi'] }}</td>
+                        <td>{{ detail['category'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+        <hr>
+    </center>
+{% endblock %}

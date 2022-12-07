@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+<!--<br><br><br><br><br><br><br><br>-->
+    <form action="/login" method="post">
+        <div>
+            Username: <input autocomplete="off" autofocus type="text" name="username" placeholder="Enter Username">
+        </div>
+        <br>
+        <div>
+            Password: <input type="password" autocomplete="off" name="password" placeholder="Enter Password">
+        </div>
+        <br>
+        <center><button type="submit">Log In</button></center>
+    </form>
+<!--<br><br><br><br><br><br><br><br>-->
+{% endblock %}
+
+{% block section %}
+    <iframe class="embed-responsive-item" width="560" height="315" src="https://www.youtube.com/embed/Z4uxU8Irhhk?rel=0&amp;autoplay=1&mute=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+{% endblock %}

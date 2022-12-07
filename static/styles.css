@@ -1,0 +1,68 @@
+body {
+    background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3)), url("https://lh3.googleusercontent.com/proxy/FWOBAVfQYasxV3KURX1VVKem1yOC2iazWAb8csOmqCDwI1CCzAA1zCpnAxR-wL2rbfZNcRHbI5b-SZfLASmF7uhJnzrksBWougEGlkw_-4U=w3840-h2160-p-k-no-nd-mv");
+    opacity: 1;
+ 	background-size: cover;
+ 	color: white;
+ 	font-family: monospace;
+ 	counter-reset: Serial;
+}
+a {
+	color: white;
+}
+a:hover {
+    color: yellow;
+}
+
+nav .navbar-brand
+{
+    /* size for brand */
+    font-size: xx-large;
+}
+
+/* Colors for brand */
+nav .navbar-brand .red
+{
+    color: #f55b31;
+}
+nav .navbar-brand .yellow
+{
+    color: #fccb17;
+}
+nav .navbar-brand .green
+{
+    color: #23e826;
+}
+nav .brand-font {
+    font-family: cursive;
+}
+nav .brand-font2 {
+    font-family: fantasy;
+}
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    padding: 18px;
+}
+form {
+    align-items: center;
+}
+hr {
+    border: 1px solid;
+}
+#dashboard {
+    padding: 8px 0;
+    margin: 5px;
+}
+#dashTable {
+    width: 100%;
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
+}
+.auto-index td:first-child:before
+{
+  counter-increment: Serial;      /* Increment the Serial counter */
+  content: counter(Serial); /* Display the counter */
+}

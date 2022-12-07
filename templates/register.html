@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+	<center><h2>Welcome to ProjectMota!</h2><br>
+	<h5>Sign up for a new account below...</h5><br>
+    <form action="/register" method="post">
+	    <div>
+	        Username: <input autocomplete="off" autofocus type="text" name="username" placeholder="Enter Username">
+	    </div><br>
+	    <div>
+		    Email ID: <input autocomplete="off" type="email" name="email" placeholder="Enter email ID">
+		</div><br>
+		<div>
+		    Password: <input autocomplete="off" type="password" name="password" placeholder="Enter Password">
+		</div><br>
+		<div>
+		    Confirm Password: <input autocomplete="off" type="password" name="confirm-pwd" placeholder="Re-enter Password">
+		</div><br>
+		<button type="submit">Register</button>
+		</center>
+	</form>
+{% endblock %}

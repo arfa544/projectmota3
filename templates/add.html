@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add Members
+{% endblock %}
+
+{% block main %}
+    <center>
+        <h3><em>Add New Family Members</em></h3>
+        <input type="radio" id="imperial" name="units" value="imperial"><label for="imperial">Imperial</label>
+        <input type="radio" id="metric" name="units" value="metric" checked><label for="metric">Metric</label>
+
+        <form id="addM" action="/add" method="post">
+            <div>Name: <input autofocus autocomplete="off" type="text" name="Name" id="Name" placeholder="Member's Name"><br><br></div>
+            <div>Height: <input autocomplete="off" type="number" name="cms" id="cms" placeholder="Centimeters" min=1><br><br></div>
+            <div>Weight: <input autocomplete="off" type="number" name="kgs" id="kgs" placeholder="Kilograms" min=1><br><br></div>
+        	<button type="submit" name="addMe">Update</button>
+        	<button type="reset">Clear</button>
+        </form>
+
+        <form id="addI" action="/add" method="post">
+            <div>Name: <input autofocus autocomplete="off" type="text" name="Name" id="Name" placeholder="Member's Name"><br><br></div>
+            <div>Height: <input autofocus autocomplete="off" type="number" name="feet" id="feet" placeholder="Feet" min=1>
+            <input autofocus autocomplete="off" type="number" name="inch" id="inch" placeholder="Inch" min=0><br><br></div>
+            <div>Weight: <input autocomplete="off" type="number" name="lbs" id="lbs" placeholder="Pounds" min=1><br><br></div>
+        	<button type="submit" name="addIm">Update</button>
+        	<button type="reset">Clear</button>
+        </form>
+    </center>
+    <script>
+        var units = document.getElementsByName("units");
+        var imperial = document.getElementById("addI");
+        var metric = document.getElementById("addM");
+
+        imperial.style.display = 'none';
+        metric.style.display = 'block';
+
+        for(var i = 0; i < units.length; i++) {
+            units[i].onclick = function() {
+                var val = this.value;
+                if(val == 'imperial') {
+                    imperial.style.display = 'block';
+                    metric.style.display = 'none';
+                }
+                else {
+                    imperial.style.display = 'none';
+                    metric.style.display = 'block';
+                }
+            }
+        }
+    </script>
+{% endblock %}

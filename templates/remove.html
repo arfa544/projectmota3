@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Remove Member
+{% endblock %}
+
+{% block main %}
+<center>
+    <h3><em>Remove Family Member</em></h3>
+    <form action='/remove' method='post'>
+        <div>
+            <select name="del-member">
+                <option value="" disabled="disabled" selected="true">Select Member</option>
+            {% for member in members %}
+                <option value="{{ member["name"] }}">{{ member["name"].upper() }}</option>
+            {% endfor %}
+            </select><br><br>
+        </div>
+        <button type="button" data-toggle="modal" data-target="#submitModal">Delete Member</button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="submitModal" tabindex="-1" aria-labelledby="submitModalLabel" aria-hidden="true" style="color: black;">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="submitModalLabel">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <strong><em>Do you really want to delete the selected member?<br>This action cannot be undone.</em></strong>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, don't delete.</button>
+                <button type="submit" class="btn btn-primary">Yes, delete this member</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </form>
+</center>
+{% endblock %}

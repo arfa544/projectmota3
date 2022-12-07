@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Error
+{% endblock %}
+
+{% block main %}
+    <center>
+        <h1>{{message.code}}</h1>
+        <h3>{{message.name}}</h3>
+    </center>
+{% endblock %}
