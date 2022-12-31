@@ -43,20 +43,19 @@ def login():
         username = request.form.get("username")
         if not username:
             flash("You must provide username!")
-            return redirect("/login")
+            return render_template("login.html")
 
         # Ensure password was submitted
         password = request.form.get("password")
         if not password:
             flash("You must provide password!")
-            return redirect("/login")
-
+            return render_template("login.html")
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE user_name = ?", username)
         # Ensure username exists and password is correct
-        if len(rows) != 1 or check_password_hash(rows[0]["password"], password):
+        if len(rows) != 1 or not check_password_hash(rows[0]["password"], password):
             flash("Invalid username and/or password!")
-            return redirect("/login")
+            return render_template("login.html")
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["user_id"]
