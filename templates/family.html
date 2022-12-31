@@ -16,21 +16,28 @@
                 <th>WEIGHT (IN KG)</th>
                 <th>BODY MASS INDEX (BMI)</th>
                 <th>CATEGORY</th>
+                <th>RECORD_DATE</th>
             </thead>
             <tbody>
                 {% for detail in details %}
                     <tr>
                         <td></td>
-                        <td>{{ detail['name'].upper() }}</td>
+                        <td>{{ detail['user_name'].upper() }}</td>
                         <td>{{ detail['height'] }}</td>
                         <td>{{ detail['weight'] }}</td>
                         <td>{{ detail['bmi'] }}</td>
                         <td>{{ detail['category'] }}</td>
+                        <td>{{ detail['record_date'] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
             <tfoot></tfoot>
         </table>
         <hr>
+
+        <div class="image-blurred-edge">
+            <img src={{ fig_path }} alt="Server Error">
+        </div>
+
     </center>
 {% endblock %}
