@@ -1,15 +1,15 @@
 -- Insert values in users table
 INSERT INTO users (user_id, user_name, password, email) VALUES
-(1,'Kathryn Castillo',12,'Kathryn@gmail.com'),
-(2,'Kai Alexander',12,'Kai@gmail.com'),
-(3,'Lyla Fleming',12,'Lyla@gmail.com'),
-(4,'Fernando Barrera',12,'Fernando@gmail.com'),
-(5,'Beatrice Nielsen',12,'Beatrice@gmail.com'),
-(6,'Tru Wade',12,'Tru@gmail.com'),
-(7,'Evie Hahn',12,'Evie@gmail.com'),
-(8,'Kabir Boone',12,'Kabir@gmail.com'),
-(9,'Mariam Christian',12,'Mariam@gmail.com'),
-(10,'Ledger Estrada',12,'Ledger@gmail.com');
+(1,'Kathryn Castillo','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Kathryn@gmail.com'),
+(2,'Kai Alexander','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Kai@gmail.com'),
+(3,'Lyla Fleming','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Lyla@gmail.com'),
+(4,'Fernando Barrera','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Fernando@gmail.com'),
+(5,'Beatrice Nielsen','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Beatrice@gmail.com'),
+(6,'Tru Wade','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Tru@gmail.com'),
+(7,'Evie Hahn','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Evie@gmail.com'),
+(8,'Kabir Boone','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Kabir@gmail.com'),
+(9,'Mariam Christian','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Mariam@gmail.com'),
+(10,'Ledger Estrada','pbkdf2:sha256:260000$qBcsmhKT$f21fa7b354c1321bb56cd361f07c94415427492d78229891db20742f6a422070','Ledger@gmail.com');
 
 -- Insert values in family table
 INSERT INTO family (family_id, family_name) VALUES
