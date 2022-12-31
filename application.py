@@ -1,12 +1,13 @@
 import os
-from datetime import datetime
 
+from datetime import datetime
 from flask import Flask, flash, redirect, request, session, render_template
 from cs50 import SQL
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+from matplotlib import pyplot as plt
 
 from helpers import login_required
 
@@ -51,15 +52,18 @@ def login():
             return redirect("/login")
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = ?", username)
-
+        rows = db.execute("SELECT * FROM users WHERE user_name = ?", username)
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["pwd"], password):
+        if len(rows) != 1 or check_password_hash(rows[0]["password"], password):
             flash("Invalid username and/or password!")
             return redirect("/login")
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = rows[0]["user_id"]
+
+        # Remember which family_id user has logged in
+        family_id = db.execute(f"SELECT family_id FROM family_user_mapping where user_id = {session['user_id']}")[0]["family_id"]
+        session["family_id"] = family_id
 
         # Redirect user to home page
         return redirect("/")
@@ -84,9 +88,9 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    rows = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    rows = db.execute("SELECT * FROM users WHERE user_id = ?", session["user_id"])
 
-    history = db.execute("SELECT date, height, weight, bmi FROM profile WHERE user_id = ?", session["user_id"])
+    history = db.execute("SELECT record_date, height, weight, bmi FROM records WHERE user_id = ? ORDER BY record_date DESC", session["user_id"])
     for x in range(len(history)):
         if history[x]["bmi"] < 18.5:
             history[x].update(category = 'underweight')
@@ -99,7 +103,20 @@ def index():
         elif history[x]["bmi"] >= 30:
             history[x].update(category = 'obese')
 
-    return render_template('index.html', user=rows[0]["username"], details=history)
+    # Plotting graph for personal dashboard
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots(1)
+    bmis = list(map(lambda x: x['bmi'], history))
+    record_dates = list(map(lambda x: datetime.strptime(x['record_date'],"%Y %m %d %H:%M:%S"), history))
+    bmis.reverse()
+    record_dates.reverse()
+    ax.plot(record_dates, bmis, marker='o', color = 'r')
+    ax.set(title="BMI over time", ylabel="BMI")
+    plt.xticks(rotation=15, ha='right')
+    fig.tight_layout()
+    fig_path = "./static/plots/index_plot1.png"
+    fig.savefig(fig_path)
+    return render_template('index.html', user=rows[0]["user_name"], details=history, fig_path=fig_path)
 
 
 @app.route('/bmi')
@@ -119,8 +136,8 @@ def update():
         if 'updateIm' in request.form:
 
             # checking for name
-            name = request.form.get('Name')
-            if not name:
+            username = request.form.get('Name')
+            if not username:
                 flash("You must enter a name!")
                 return redirect('/update')
 
@@ -142,15 +159,12 @@ def update():
             kgs = round(int(lbs) * 0.453592, 2)
             cms = round((int(feet) * 12 + int(inch)) * 2.54, 2)
 
-            # updating family table
-            db.execute("UPDATE family SET height = ?, weight = ?, bmi = ? WHERE user_id = ? and name = ?", cms, kgs, bmi, session["user_id"], name)
-
         # using metric units
         if 'updateMe' in request.form:
 
             # checking for name
-            name = request.form.get('Name')
-            if not name:
+            username = request.form.get('Name')
+            if not username:
                 flash("You must choose a name!")
                 return redirect('/update')
 
@@ -169,8 +183,9 @@ def update():
             # calculating bmi, height in cms, weight in kgs
             bmi = round(int(kgs) * 10000 / pow(int(cms), 2), 2)
 
-            # updating family table
-            db.execute("UPDATE family SET height = ?, weight = ?, bmi = ? WHERE user_id = ? and name = ?", cms, kgs, bmi, session["user_id"], name)
+        # Insert into records
+        user_id = db.execute("SELECT user_id FROM users WHERE user_name = ?", username)[0]['user_id']
+        db.execute("INSERT INTO records(user_id, height, weight, bmi, record_date) VALUES(?,?,?,?,?)", user_id, cms, kgs, bmi, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         flash('Family details updated successfully!')
         return redirect('/family')
@@ -179,18 +194,18 @@ def update():
     else:
 
         # finding family members
-        members = db.execute("SELECT name FROM family WHERE user_id = ?", session['user_id'])
+        members = db.execute("SELECT user_name FROM users LEFT JOIN family_user_mapping USING (user_id) WHERE family_id = ?", session['family_id'])
 
         # query database for username
-        user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
+        user = db.execute("SELECT user_name FROM users WHERE user_id = ?", session["user_id"])
 
         # removing user's name from members list
         for i in range(len(members)):
-            if members[i]['name'] == user[0]['username']:
+            if members[i]['user_name'] == user[0]['user_name']:
                 del members[i]
                 break
 
-        # checking members list
+        # checking members dict.
         if not members:
             flash('You have not yet added any family members!')
             return redirect('/add')
@@ -206,61 +221,35 @@ def add():
     if request.method =='POST':
 
         # using imperial units
-        if 'addIm' in request.form:
+        if 'add' in request.form:
 
             # checking for name
-            name = request.form.get('Name')
-            if not name:
+            username = request.form.get('Name')
+            if not username:
                 flash("You must enter a name!")
                 return redirect('/add')
 
-            # checking for height
-            feet = request.form.get("feet")
-            inch = request.form.get("inch")
-            if not feet and not inch:
-                flash("Height cannot be left blank!")
-                return redirect('/add')
+            # checking email
+            email = request.form.get("email")
+            if not email:
+                flash("You must provide email id!")
+                return redirect("/add")
+            if '@' not in email or '.' not in email:
+                flash("You must provide a valid email id!")
+                return redirect("/add")
 
-            # checking for weight
-            lbs = request.form.get("lbs")
-            if not lbs:
-                flash("Weight cannot be left blank!")
-                return redirect('/add')
+            # checking and confirming password
+            password = request.form.get("password")
+            if not password:
+                flash("Missing password!")
+                return redirect("/add")
+            if password != request.form.get("confirm-pwd") or not request.form.get("confirm-pwd"):
+                flash("Passwords do not match!")
+                return redirect("/add")
 
-            # calculating bmi, height in cms, weight in kgs
-            bmi = round(703 * int(lbs) / pow((int(feet) * 12 + int(inch)), 2), 2)
-            kgs = round(int(lbs) * 0.453592, 2)
-            cms = round((int(feet) * 12 + int(inch)) * 2.54, 2)
-
-            # adding new entry in family table
-            db.execute("INSERT INTO family (user_id, name, weight, height, bmi) VALUES (?, ?, ?, ?, ?)", session["user_id"], name, kgs, cms, bmi)
-
-        # using metric units
-        if 'addMe' in request.form:
-
-            # checking for name
-            name = request.form.get('Name')
-            if not name:
-                flash("You must enter a name!")
-                return redirect('/add')
-
-            # checking for height
-            cms = request.form.get("cms")
-            if not cms:
-                flash("Height cannot be left blank!")
-                return redirect('/add')
-
-            # checking for weight
-            kgs = request.form.get("kgs")
-            if not kgs:
-                flash("Weight cannot be left blank!")
-                return redirect('/add')
-
-            # calculating bmi, height in cms, weight in kgs
-            bmi = round(int(kgs) * 10000 / pow(int(cms), 2), 2)
-
-            # adding new entry in family table
-            db.execute("INSERT INTO family (user_id, name, weight, height, bmi) VALUES (?, ?, ?, ?, ?)", session["user_id"], name, kgs, cms, bmi)
+            # inserting and hashing new user
+            user_id = db.execute("INSERT INTO users (user_name, password, email) VALUES (?, ?, ?)", username, generate_password_hash(password, method='pbkdf2:sha256', salt_length=8), email)
+            db.execute(f"INSERT INTO family_user_mapping (family_id, user_id) VALUES ({session['family_id']}, {user_id})")
 
         flash('New family member added successfully!')
         return redirect('/family')
@@ -284,7 +273,8 @@ def remove():
             return redirect('/remove')
 
         # deleting the reqested entry from family table
-        db.execute('DELETE FROM family WHERE name = ? and user_id = ?', name, session['user_id'])
+        user_id = db.execute("SELECT user_id FROM users WHERE user_name = ?", name)[0]['user_id']
+        db.execute('DELETE FROM records WHERE user_id = ?', user_id)
 
         flash('Member was removed successfully!')
         return redirect('/family')
@@ -293,14 +283,14 @@ def remove():
     else:
 
         # finding family members
-        members = db.execute("SELECT name FROM family WHERE user_id = ?", session['user_id'])# checking members list
-
+        members = db.execute("SELECT user_name FROM users LEFT JOIN family_user_mapping USING (user_id) WHERE family_id = ?", session['family_id'])# checking members list
+        
         # query database for username
-        user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
+        user = db.execute("SELECT user_name FROM users WHERE user_id = ?", session["user_id"])
 
         # removing user's name from members list
         for i in range(len(members)):
-            if members[i]['name'] == user[0]['username']:
+            if members[i]['user_name'] == user[0]['user_name']:
                 del members[i]
                 break
 
@@ -315,22 +305,46 @@ def remove():
 @app.route('/family')
 @login_required
 def family():
-    rows = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    user_ids = db.execute("SELECT user_id FROM family_user_mapping WHERE family_id = ?", session["family_id"])
 
-    history = db.execute("SELECT name, height, weight, bmi FROM family WHERE user_id = ?", session["user_id"])
-    for x in range(len(history)):
-        if history[x]["bmi"] < 18.5:
-            history[x].update(category = 'Underweight')
-        elif history[x]["bmi"] >= 18.5 and history[x]["bmi"] < 23:
-            history[x].update(category = 'Normal')
-        elif history[x]["bmi"] >= 23 and history[x]['bmi'] < 25:
-            history[x].update(category = 'Overweight')
-        elif history[x]["bmi"] >= 25 and history[x]['bmi'] < 30:
-            history[x].update(category = 'Pre-obese')
-        elif history[x]["bmi"] >= 30:
-            history[x].update(category = 'Obese')
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots(1)
 
-    return render_template('family.html', details=history)
+    details = list()
+    for user_id in user_ids:
+        user_id = user_id["user_id"]
+        user_name = db.execute("SELECT user_name FROM users WHERE user_id = ?", user_id)[0]["user_name"]
+        records = db.execute("SELECT height, weight, bmi, record_date FROM records WHERE user_id = ? ORDER BY record_date DESC", user_id)
+        if not records:
+            continue
+        record = records[0]
+        record["user_name"] = user_name
+        if record["bmi"] < 18.5:
+            record.update(category = 'Underweight')
+        elif record["bmi"] >= 18.5 and record["bmi"] < 23:
+            record.update(category = 'Normal')
+        elif record["bmi"] >= 23 and record['bmi'] < 25:
+            record.update(category = 'Overweight')
+        elif record["bmi"] >= 25 and record['bmi'] < 30:
+            record.update(category = 'Pre-obese')
+        elif record["bmi"] >= 30:
+            record.update(category = 'Obese')
+
+        details.append(record)
+        bmis = list(map(lambda x: x['bmi'], records))
+        record_dates = list(map(lambda x: datetime.strptime(x['record_date'],"%Y %m %d %H:%M:%S"), records))
+        bmis.reverse()
+        record_dates.reverse()
+        # Plotting graph of each family member
+        ax.plot(record_dates, bmis, marker='o', label = user_name)
+        plt.legend()
+
+    ax.set(title="BMI over time", ylabel="BMI")
+    plt.xticks(rotation=15, ha='right')
+    fig.tight_layout()
+    fig_path = "./static/plots/family_plot1.png"
+    fig.savefig(fig_path)
+    return render_template('family.html', details=details, fig_path=fig_path)
 
 
 @app.route('/profile', methods=["GET", "POST"])
@@ -360,13 +374,6 @@ def profile():
             kgs = round(int(lbs) * 0.453592, 2)
             cms = round((int(feet) * 12 + int(inch)) * 2.54, 2)
 
-            # updating profile table
-            db.execute("UPDATE profile SET weight = ?, height = ?, bmi = ? WHERE user_id = ?", kgs, cms, bmi, session["user_id"])
-
-            # updating family table
-            user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
-            db.execute("UPDATE family SET weight= ?, height = ?, bmi = ? WHERE user_id = ? and name = ?", kgs, cms, bmi, session["user_id"], user[0]["username"])
-
         # metric units were chosen
         elif 'updateMe' in request.form:
 
@@ -385,15 +392,11 @@ def profile():
             # calculating bmi, height in cms, weight in kgs
             bmi = round(int(kgs) * 10000 / pow(int(cms), 2), 2)
 
-            # updating profile table
-            db.execute("UPDATE profile SET weight = ?, height = ?, bmi = ? WHERE user_id = ?", kgs, cms, bmi, session["user_id"])
-
-            # updating family table
-            user = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
-            db.execute("UPDATE family SET weight= ?, height = ?, bmi = ? WHERE user_id = ? and name = ?", kgs, cms, bmi, session["user_id"], user[0]["username"])
-
         else:
-            print("ERRRORRR ERRRORRR ERRRORRR")
+            raise Exception(f"Unknown Option provided.")
+
+        # Insert into records
+        db.execute("INSERT INTO records(user_id, height, weight, bmi, record_date) VALUES(?,?,?,?,?)", session["user_id"], cms, kgs, bmi, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         flash("Profile details updated successfully!")
         return redirect("/")
@@ -413,7 +416,7 @@ def register():
         if not username:
             flash("You must provide username!")
             return redirect("/register")
-        user_exists = db.execute("SELECT username FROM users WHERE username = ?", username)
+        user_exists = db.execute("SELECT user_name FROM users WHERE user_name = ?", username)
         if user_exists != []:
             flash("User already exists! Choose another username.")
             return redirect("/register")
@@ -437,22 +440,35 @@ def register():
             return redirect("/register")
 
         # inserting and hashing new user
-        db.execute("INSERT INTO users (username, pwd, email) VALUES (?, ?, ?)", username, generate_password_hash(password, method='pbkdf2:sha256', salt_length=8), email)
+        user_id = db.execute("INSERT INTO users (user_name, password, email) VALUES (?, ?, ?)", username, generate_password_hash(password, method='pbkdf2:sha256', salt_length=8), email)
+
+        # get selected Family Name
+        selected_family_name = request.form.get("select_family_name")
+
+        if selected_family_name is None:
+            new_family_name = request.form.get("new_family_name")
+            if new_family_name is None:
+                flash("Please select a existing Family name, or provide a new family name.")
+                return redirect("/register")
+
+            family_name_exists = db.execute("SELECT family_name FROM family WHERE family_name = ?", new_family_name)
+            if family_name_exists != []:
+                flash("Family Name already exists! Please select from drop down.", category="warning")
+                return redirect("/register")
+
+            family_id = db.execute("INSERT INTO family(family_name) VALUES (?)", new_family_name)
+
+        else:
+            family_id = db.execute("SELECT family_id from family WHERE family_name = ?", selected_family_name)[0]['family_id']
 
 
-        user = db.execute("SELECT id FROM users WHERE username = ?", username)
-
-        # creating new entry for user in family and profile table
-        db.execute("INSERT INTO family (user_id, name, height, weight, bmi) VALUES (?, ?, ?, ?, ?)", user[0]["id"], username, 0, 0, 0)
-        db.execute("INSERT INTO profile (user_id, date, height, weight, bmi) VALUES (?, ?, ?, ?, ?)", user[0]["id"], datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0, 0, 0)
+        # Inserting user_id and respective family_id in family_user_mapping
+        db.execute(f"INSERT INTO family_user_mapping (family_id, user_id) VALUES ({family_id}, {user_id})")
 
         """ Automatically log in new user """
-
-        # query database for user's details
-        rows = db.execute("SELECT * FROM users WHERE username = ?", username)
-
         # remember new user's session to log in
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = user_id
+        session["family_id"] = family_id
 
         # redirect user to edit profile
         flash("Welcome to ProjectMota2. Please enter your personal details below.")
@@ -460,7 +476,9 @@ def register():
 
     # User reached route via GET
     else:
-        return render_template("register.html")
+        # Get all family members dict.
+        members = db.execute("SELECT family_name FROM family")
+        return render_template("register.html", members=members)
 
 
 def errorhandler(e):
