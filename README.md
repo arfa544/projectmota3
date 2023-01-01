@@ -1,5 +1,5 @@
-# ProjectMota2
-#### Video Demo: [watch here on YouTube](https://youtu.be/VkG5f3NflDc)
+expo# ProjectMota3
+#### Video Demo: [watch here on YouTube](https://youtu.be/)
 #### Description:
 This is a web application useful for calculating & storing your and your family's height, weight and body mass index or BMI. This project intends to encouraging the user to make healthy decisions and be conscious of their diet to improve their quality of life and health. BMI is one of the important measures of bone, muscle and tissue fitness. The BMI category ranges vary between European and Asian criteria. Since the Asian standard has vaster categories, ProjectMota2 uses it for categorizing the collected data.
 ## Layout
@@ -41,6 +41,14 @@ This page tabulates the data of user's family members. Both of the dynamically g
 The BMI or Body Mass Index is defined as the body mass divided by the square of the body height, with the unit of kg per sq. m. This is an interactive page which allows you to check your BMI without making any changes to the database. A colour-coded display then shows your BMI as per the categories: Underweight, Normal, Overweight, Obese with respect to the Asian BMI standard.
 ## Security and Data Privacy
 The session data is stored on the top of cookies and signed by the server cryptographically. Flask has been used to track the session data. The user's password is secured using Werkzeug. Session data is cleared on logging out successfully or once the server is turned off. Any data you entered for storage is completely private and visible only to you when logged in. No data is shared with or sold to any third-party.
+## Improvements done in this project
+- Updated the database schema for easiar access and normalisation is done.
+- Created history table(personal dashboard) for user who is logged in.
+- Plotted line graph of the user in personal dashboard, BMI on x-axis and date time on Y-axis.
+- Plotted multiple line graph for each member in family dashboard to analyse the BMI of all family members taking BMI on x-axis and date time on
+  y-axis.
+#### Further notes
+DML queries are made for demo of the project.
 ## Programming Technologies used
 - Python
 - HTML
@@ -55,7 +63,8 @@ The session data is stored on the top of cookies and signed by the server crypto
 - CS50 library for SQLite3
 
 
-Based on [Mashhood Alam's](https://github.com/MASHOD0) [ProjectMota](https://github.com/MASHOD0/ProjectMota)
+Based on [Mashhood Alam's](https://github.com/MASHOD0) [ProjectMota](https://github.com/MASHOD0/ProjectMota) and
+[Aieshah Nasir's](https://github.com/aie007) [ProjectMota2](https://github.com/aie007/projectmota2)
 
 
-Developed by [Aieshah Nasir](https://github.com/aie007) as CS50 Final Project - CS50x2021
+Developed by [Shaik Arfa Ameena](https://github.com/arfa544) as CS50 Final Project - CS50x2022
