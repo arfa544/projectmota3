@@ -20,6 +20,17 @@
 		<div>
 		    Confirm Password: <input autocomplete="off" type="password" name="confirm-pwd" placeholder="Re-enter Password">
 		</div><br>
+		<div>
+			Family Name:
+            <select name="select_family_name">
+                <option value="" disabled="disabled" selected="true">Select Family Name</option>
+                {% for member in members %}
+                    <option value="{{ member["family_name"] }}">{{ member["family_name"].upper() }}</option>
+                {% endfor %}
+            </select>
+			<br> or <br> Enter New Family Name: <input autocomplete="off" autofocus type="text" name="new_family_name" placeholder="New Family Name">
+			<br><br>
+        </div>
 		<button type="submit">Register</button>
 		</center>
 	</form>

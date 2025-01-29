@@ -15,7 +15,7 @@
             <select name="Name">
                 <option value="" disabled="disabled" selected="true">Member's Name</option>
                 {% for member in members %}
-                    <option value="{{ member["name"] }}">{{ member["name"].upper() }}</option>
+                    <option value="{{ member["user_name"] }}">{{ member["user_name"].upper() }}</option>
                 {% endfor %}
             </select><br><br>
         </div>
@@ -30,7 +30,7 @@
             <select name="Name">
                 <option value="" disabled="disabled" selected="true">Member's Name</option>
                 {% for member in members %}
-                    <option value="{{ member["name"] }}">{{ member["name"].upper() }}</option>
+                    <option value="{{ member["user_name"] }}">{{ member["user_name"].upper() }}</option>
                 {% endfor %}
             </select><br><br>
         </div>

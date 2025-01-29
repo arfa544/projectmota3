@@ -13,14 +13,37 @@
         <hr>
         <div id="dashboard">
             <h3 style="text-decoration: underline;">Dashboard</h3>
-            {% for detail in details %}
-            HEIGHT: {{ detail["height"] }} cms <br><br>
-            WEIGHT: {{ detail["weight"] }} kgs <br><br>
-            BODY MASS INDEX (BMI): {{ detail["bmi"] }} <br><br>
-            LAST UPDATED ON: {{ detail["date"] }} <br><br>
-            REMARKS: You are currently {{ detail["category"] }}!<br>
-            {% endfor %}
+            <table id='dashTable' class="auto-index" cellspacing=0 cellpadding=10>
+                <thead>
+                    <th>#</th>
+
+                    <th>HEIGHT (IN CM)</th>
+                    <th>WEIGHT (IN KG)</th>
+                    <th>BODY MASS INDEX (BMI)</th>
+                    <th>CATEGORY</th>
+                    <th>RECORD_DATE</th>
+                </thead>
+                <tbody>
+                    {% for detail in details %}
+                        <tr>
+                            <td></td>
+
+                            <td>{{ detail['height'] }}</td>
+                            <td>{{ detail['weight'] }}</td>
+                            <td>{{ detail['bmi'] }}</td>
+                            <td>{{ detail['category'] }}</td>
+                            <td>{{ detail['record_date'] }}</td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot></tfoot>
+            </table>
         </div>
         <hr>
+        <div class="image-blurred-edge">
+            <img src={{ fig_path }} alt="Server Error">
+        </div>
+
     </center>
 {% endblock %}
